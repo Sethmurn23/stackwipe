@@ -1,1171 +1,945 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StackWipe - SaaS Subscription Management</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --border: #e2e8f0;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --text-muted: #94a3b8;
-            --sidebar-width: 260px;
-        }
-
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            padding: 24px 16px;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 12px;
-            margin-bottom: 32px;
-        }
-
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: var(--primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .logo-text {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .nav-section {
-            margin-bottom: 24px;
-        }
-
-        .nav-label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            padding: 0 12px;
-            margin-bottom: 8px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 10px;
-            color: var(--text-light);
-            cursor: pointer;
-            transition: all 0.15s;
-            font-size: 14px;
-            font-weight: 500;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-        }
-
-        .nav-item:hover {
-            background: var(--bg);
-            color: var(--text);
-        }
-
-        .nav-item.active {
-            background: #eff6ff;
-            color: var(--primary);
-        }
-
-        .nav-item.active i {
-            color: var(--primary);
-        }
-
-        .nav-badge {
-            margin-left: auto;
-            background: var(--danger);
-            color: white;
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-
-        /* Main Content */
-        .main {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            padding: 32px;
-            min-height: 100vh;
-        }
-
-        .header {
-            margin-bottom: 32px;
-        }
-
-        .header-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .header-subtitle {
-            color: var(--text-light);
-            font-size: 15px;
-        }
-
-        /* Cards */
-        .card {
-            background: var(--surface);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            padding: 24px;
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-        }
-
-        .stat-icon.blue { background: #dbeafe; color: var(--primary); }
-        .stat-icon.green { background: #d1fae5; color: var(--success); }
-        .stat-icon.orange { background: #fef3c7; color: var(--warning); }
-        .stat-icon.red { background: #fee2e2; color: var(--danger); }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            color: var(--text-light);
-            font-size: 14px;
-        }
-
-        .stat-change {
-            font-size: 13px;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .stat-change.up { color: var(--success); }
-        .stat-change.down { color: var(--danger); }
-
-        /* Tables */
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            background: var(--bg);
-        }
-
-        td {
-            font-size: 14px;
-        }
-
-        tr:hover td {
-            background: var(--bg);
-        }
-
-        /* Tags */
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .tag.active { background: #d1fae5; color: #065f46; }
-        .tag.warning { background: #fef3c7; color: #92400e; }
-        .tag.inactive { background: #f1f5f9; color: #64748b; }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-            border: none;
-            font-family: inherit;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: var(--bg);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .btn-danger {
-            background: #fee2e2;
-            color: var(--danger);
-        }
-
-        .btn-danger:hover {
-            background: #fecaca;
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 13px;
-        }
-
-        /* Forms */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.15s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            background: white;
-            cursor: pointer;
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s;
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal {
-            background: var(--surface);
-            border-radius: 20px;
-            padding: 32px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: translateY(20px);
-            transition: all 0.2s;
-        }
-
-        .modal-overlay.show .modal {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .modal-close {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            border: none;
-            background: var(--bg);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-        }
-
-        /* Onboarding */
-        .onboarding {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--bg);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .onboarding.hidden {
-            display: none;
-        }
-
-        .onboarding-card {
-            background: var(--surface);
-            border-radius: 24px;
-            padding: 48px;
-            width: 90%;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        .onboarding-icon {
-            width: 80px;
-            height: 80px;
-            background: #dbeafe;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            color: var(--primary);
-        }
-
-        .onboarding-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .onboarding-subtitle {
-            color: var(--text-light);
-            font-size: 16px;
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
-
-        .onboarding-steps {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 32px;
-        }
-
-        .onboarding-step {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--border);
-        }
-
-        .onboarding-step.active {
-            background: var(--primary);
-        }
-
-        .onboarding-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 14px 32px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: inherit;
-        }
-
-        .onboarding-btn.primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .onboarding-btn.primary:hover {
-            background: var(--primary-hover);
-        }
-
-        .checkbox-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            text-align: left;
-            margin: 24px 0;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .checkbox-item:hover {
-            border-color: var(--primary);
-        }
-
-        .checkbox-item input {
-            width: 20px;
-            height: 20px;
-            accent-color: var(--primary);
-        }
-
-        /* Alert Cards */
-        .alert-card {
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-        }
-
-        .alert-card.warning {
-            background: #fef3c7;
-            border: 1px solid #fcd34d;
-        }
-
-        .alert-card.info {
-            background: #dbeafe;
-            border: 1px solid #93c5fd;
-        }
-
-        .alert-card.danger {
-            background: #fee2e2;
-            border: 1px solid #fca5a5;
-        }
-
-        .alert-card.success {
-            background: #d1fae5;
-            border: 1px solid #6ee7b7;
-        }
-
-        /* Integration Cards */
-        .integration-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .integration-card {
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.15s;
-        }
-
-        .integration-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .integration-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .integration-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .integration-name {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .integration-desc {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-bottom: 16px;
-            line-height: 1.5;
-        }
-
-        .integration-meta {
-            display: flex;
-            gap: 16px;
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-
-        /* Chart placeholder */
-        .chart-container {
-            height: 200px;
-            display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            padding: 20px 0;
-        }
-
-        .chart-bar {
-            flex: 1;
-            background: linear-gradient(to top, var(--primary), #60a5fa);
-            border-radius: 4px 4px 0 0;
-            min-height: 20px;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .chart-bar:hover {
-            background: var(--primary);
-        }
-
-        .chart-bar::after {
-            content: attr(data-label);
-            position: absolute;
-            bottom: -24px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 11px;
-            color: var(--text-muted);
-            white-space: nowrap;
-        }
-
-        /* Usage bar */
-        .usage-bar {
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-
-        .usage-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-
-        .usage-fill.high { background: var(--success); }
-        .usage-fill.medium { background: var(--warning); }
-        .usage-fill.low { background: var(--danger); }
-
-        /* Settings */
-        .settings-section {
-            margin-bottom: 32px;
-        }
-
-        .settings-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .toggle-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .toggle-label {
-            font-size: 14px;
-        }
-
-        .toggle {
-            width: 48px;
-            height: 26px;
-            background: var(--border);
-            border-radius: 13px;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .toggle.active {
-            background: var(--primary);
-        }
-
-        .toggle::after {
-            content: '';
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .toggle.active::after {
-            left: 24px;
-        }
-
-        /* Redundancy */
-        .redundancy-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 20px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            margin-bottom: 12px;
-        }
-
-        .redundancy-tools {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
-        }
-
-        .tool-badge {
-            padding: 6px 12px;
-            background: var(--bg);
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .tool-arrow {
-            color: var(--text-muted);
-        }
-
-        .savings-badge {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 48px;
-            color: var(--text-light);
-        }
-
-        .empty-state i {
-            margin-bottom: 16px;
-            color: var(--text-muted);
-        }
-
-        /* Mobile */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main {
-                margin-left: 0;
-                padding: 20px;
-            }
-
-            .mobile-menu-btn {
-                display: flex;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header-title {
-                font-size: 24px;
-            }
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 200;
-            width: 44px;
-            height: 44px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StackWipe - SaaS Subscription Manager</title>
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --secondary: #64748b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1);
+  --sidebar-width: 240px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  position: fixed;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.logo h1 {
+  font-size: 24px;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo span {
+  background: var(--primary);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.nav-menu {
+  flex: 1;
+}
+
+.nav-item {
+  padding: 12px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover { background: var(--bg); }
+.nav-item.active {
+  background: var(--bg);
+  color: var(--primary);
+  border-left-color: var(--primary);
+  font-weight: 600;
+}
+
+.nav-item svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Main Content */
+.main {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  padding: 24px;
+}
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* Dashboard */
+.dashboard-header {
+  margin-bottom: 24px;
+}
+
+.dashboard-header h2 {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+
+.dashboard-header p {
+  color: var(--text-muted);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.stat-card h3 {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-card .value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stat-card .value.warning { color: var(--warning); }
+.stat-card .value.danger { color: var(--danger); }
+.stat-card .value.success { color: var(--success); }
+
+/* Sections */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.section h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Alerts */
+.alert {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.alert.warning {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+}
+
+.alert.danger {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+/* Table */
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+tr:hover { background: var(--bg); }
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge.active { background: #d1fae5; color: #065f46; }
+.badge.inactive { background: #f3f4f6; color: #6b7280; }
+.badge.canceled { background: #fee2e2; color: #991b1b; }
+
+.category-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--bg);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.action-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.action-btn.delete { background: #fee2e2; color: #991b1b; }
+.action-btn.delete:hover { background: #fca5a5; }
+
+.price {
+  font-weight: 600;
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover { background: var(--primary-dark); }
+
+.btn-secondary {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover { background: var(--border); }
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 { font-size: 18px; }
+
+.modal-body { padding: 20px; }
+
+.modal-footer {
+  padding: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.form-group { margin-bottom: 16px; }
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-state svg {
+  width: 80px;
+  height: 80px;
+  color: var(--border);
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+/* Integration Templates */
+.integration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.integration-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.integration-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.integration-card h4 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.integration-card p {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.integration-tags {
+  display: flex;
+  gap: 8px;
+}
+
+.tag {
+  padding: 4px 8px;
+  background: var(--bg);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Settings */
+.settings-section {
+  margin-bottom: 32px;
+}
+
+.settings-section h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.settings-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-option label {
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+    z-index: 100;
+  }
+  
+  .sidebar.open { transform: translateX(0); }
+  
+  .main { margin-left: 0; }
+  
+  .mobile-menu-btn {
+    display: block;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 99;
+    padding: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.mobile-menu-btn { display: none; }
+</style>
 </head>
 <body>
-    <button class="mobile-menu-btn" onclick="toggleSidebar()">
-        <i data-lucide="menu"></i>
-    </button>
+<div class="app-container">
+  <button class="mobile-menu-btn" onclick="toggleSidebar()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 12h18M3 6h18M3 18h18"/>
+    </svg>
+  </button>
+  
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">
+      <h1><span>SW</span> StackWipe</h1>
+    </div>
+    <nav class="nav-menu">
+      <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" data-page="subscriptions" onclick="showPage('subscriptions')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        Subscriptions
+      </div>
+      <div class="nav-item" data-page="integrations" onclick="showPage('integrations')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        Integrations
+      </div>
+      <div class="nav-item" data-page="settings" onclick="showPage('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        Settings
+      </div>
+    </nav>
+  </aside>
 
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="logo">
-            <div class="logo-icon">
-                <i data-lucide="layers"></i>
-            </div>
-            <span class="logo-text">StackWipe</span>
+  <main class="main">
+    <!-- Dashboard Page -->
+    <div class="page active" id="page-dashboard">
+      <div class="dashboard-header">
+        <h2>Dashboard</h2>
+        <p>Overview of your SaaS stack</p>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Total Tools</h3>
+          <div class="value" id="stat-total">0</div>
         </div>
-
-        <div class="nav-section">
-            <div class="nav-label">Main</div>
-            <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
-                <i data-lucide="layout-dashboard"></i>
-                Dashboard
-            </button>
-            <button class="nav-item" data-page="subscriptions" onclick="showPage('subscriptions')">
-                <i data-lucide="credit-card"></i>
-                Subscriptions
-                <span class="nav-badge" id="renewal-badge">2</span>
-            </button>
-            <button class="nav-item" data-page="redundancy" onclick="showPage('redundancy')">
-                <i data-lucide="git-compare"></i>
-                Redundancy
-            </button>
-            <button class="nav-item" data-page="integrations" onclick="showPage('integrations')">
-                <i data-lucide="plug"></i>
-                Integrations
-            </button>
+        <div class="stat-card">
+          <h3>Monthly Spend</h3>
+          <div class="value" id="stat-spend">$0</div>
         </div>
-
-        <div class="nav-section">
-            <div class="nav-label">Analytics</div>
-            <button class="nav-item" data-page="analytics" onclick="showPage('analytics')">
-                <i data-lucide="bar-chart-3"></i>
-                Usage Analytics
-            </button>
+        <div class="stat-card">
+          <h3>Underutilized</h3>
+          <div class="value warning" id="stat-underutilized">0</div>
         </div>
-
-        <div class="nav-section" style="margin-top: auto;">
-            <button class="nav-item" data-page="settings" onclick="showPage('settings')">
-                <i data-lucide="settings"></i>
-                Settings
-            </button>
+        <div class="stat-card">
+          <h3>Renewing Soon</h3>
+          <div class="value danger" id="stat-renewing">0</div>
         </div>
-    </aside>
+      </div>
+      
+      <div class="section">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Redundancy Alerts
+        </h3>
+        <div id="redundancy-alerts"></div>
+      </div>
+      
+      <div class="section">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Upcoming Renewals
+        </h3>
+        <div id="renewal-alerts"></div>
+      </div>
+    </div>
 
-    <!-- Main Content -->
-    <main class="main">
-        <!-- Dashboard Page -->
-        <div class="page active" id="page-dashboard">
-            <div class="header">
-                <h1 class="header-title">Dashboard</h1>
-                <p class="header-subtitle">Overview of your SaaS stack and spending</p>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon blue">
-                        <i data-lucide="credit-card"></i>
-                    </div>
-                    <div class="stat-value" id="total-spend">$2,847</div>
-                    <div class="stat-label">Monthly SaaS Spend</div>
-                    <div class="stat-change up">
-                        <i data-lucide="trending-up"></i>
-                        +12% from last month
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon green">
-                        <i data-lucide="package"></i>
-                    </div>
-                    <div class="stat-value" id="total-tools">14</div>
-                    <div class="stat-label">Active Subscriptions</div>
-                    <div class="stat-change">
-                        <i data-lucide="plus"></i>
-                        2 new this month
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon orange">
-                        <i data-lucide="alert-triangle"></i>
-                    </div>
-                    <div class="stat-value" id="upcoming-renewals">2</div>
-                    <div class="stat-label">Upcoming Renewals</div>
-                    <div class="stat-change down">
-                        Next: Salesforce (7 days)
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon red">
-                        <i data-lucide="trending-down"></i>
-                    </div>
-                    <div class="stat-value" id="potential-savings">$480</div>
-                    <div class="stat-label">Potential Savings</div>
-                    <div class="stat-change">
-                        From overlapping tools
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Spending Trend (6 Months)</h2>
-                </div>
-                <div class="chart-container" id="spending-chart">
-                    <div class="chart-bar" style="height: 60%;" data-label="Aug"></div>
-                    <div class="chart-bar" style="height: 72%;" data-label="Sep"></div>
-                    <div class="chart-bar" style="height: 68%;" data-label="Oct"></div>
-                    <div class="chart-bar" style="height: 85%;" data-label="Nov"></div>
-                    <div class="chart-bar" style="height: 78%;" data-label="Dec"></div>
-                    <div class="chart-bar" style="height: 100%;" data-label="Jan"></div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Upcoming Renewals</h2>
-                    <button class="btn btn-secondary btn-sm" onclick="showPage('subscriptions')">View All</button>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Tool</th>
-                                <th>Cost</th>
-                                <th>Renewal Date</th>
-                                <th>Days Left</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="renewals-table">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Usage Alerts</h2>
-                </div>
-                <div id="usage-alerts">
-                </div>
-            </div>
+    <!-- Subscriptions Page -->
+    <div class="page" id="page-subscriptions">
+      <div class="dashboard-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h2>Subscriptions</h2>
+          <p>Manage all your SaaS tools</p>
         </div>
-
-        <!-- Subscriptions Page -->
-        <div class="page" id="page-subscriptions">
-            <div class="header">
-                <h1 class="header-title">Subscriptions</h1>
-                <p class="header-subtitle">Manage all your SaaS tools in one place</p>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">All Subscriptions</h2>
-                    <div style="display: flex; gap: 12px;">
-                        <button class="btn btn-secondary btn-sm" onclick="openScanModal()">
-                            <i data-lucide="scan"></i>
-                            Scan New
-                        </button>
-                        <button class="btn btn-primary btn-sm" onclick="openAddModal()">
-                            <i data-lucide="plus"></i>
-                            Add Tool
-                        </button>
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Tool</th>
-                                <th>Category</th>
-                                <th>Monthly Cost</th>
-                                <th>Users</th>
-                                <th>Renewal</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="subscriptions-table">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <button class="btn btn-primary" onclick="openModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Tool
+        </button>
+      </div>
+      
+      <div class="section">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Tool</th>
+                <th>Category</th>
+                <th>Cost</th>
+                <th>Users</th>
+                <th>Status</th>
+                <th>Renewal</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="subscriptions-table"></tbody>
+          </table>
         </div>
-
-        <!-- Redundancy Page -->
-        <div class="page" id="page-redundancy">
-            <div class="header">
-                <h1 class="header-title">Redundancy Detector</h1>
-                <p class="header-subtitle">AI-powered analysis of overlapping tools</p>
-            </div>
-
-            <div class="alert-card info">
-                <i data-lucide="info"></i>
-                <div>
-                    <strong>How it works:</strong> Our AI analyzes your tool stack to identify capabilities that overlap between different apps. Consider consolidating to save costs.
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Potential Redundancies</h2>
-                    <button class="btn btn-primary btn-sm" onclick="runRedundancyScan()">
-                        <i data-lucide="refresh-cw"></i>
-                        Rescan
-                    </button>
-                </div>
-                <div id="redundancy-list">
-                </div>
-            </div>
+        <div id="empty-subscriptions" class="empty-state" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          <h3>No subscriptions yet</h3>
+          <p>Add your first SaaS tool to start tracking your stack</p>
+          <button class="btn btn-primary" onclick="openModal()">Add First Tool</button>
         </div>
+      </div>
+    </div>
 
-        <!-- Integrations Page -->
-        <div class="page" id="page-integrations">
-            <div class="header">
-                <h1 class="header-title">Integration Templates</h1>
-                <p class="header-subtitle">Pre-built workflows to connect your tools</p>
-            </div>
+    <!-- Integrations Page -->
+    <div class="page" id="page-integrations">
+      <div class="dashboard-header">
+        <h2>Integration Templates</h2>
+        <p>Pre-built no-code workflows to connect your tools</p>
+      </div>
+      
+      <div class="integration-grid" id="integration-templates"></div>
+    </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Available Templates</h2>
-                </div>
-                <div class="integration-grid" id="integration-templates">
-                </div>
-            </div>
+    <!-- Settings Page -->
+    <div class="page" id="page-settings">
+      <div class="dashboard-header">
+        <h2>Settings</h2>
+        <p>Configure your preferences</p>
+      </div>
+      
+      <div class="section">
+        <div class="settings-section">
+          <h3>Data Management</h3>
+          <div class="settings-option">
+            <label>Export Data</label>
+            <button class="btn btn-secondary" onclick="exportData()">Export JSON</button>
+          </div>
+          <div class="settings-option">
+            <label>Import Data</label>
+            <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Import JSON</button>
+            <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
+          </div>
+          <div class="settings-option">
+            <label>Reset All Data</label>
+            <button class="btn btn-secondary" style="background:#fee2e2;color:#991b1b;" onclick="resetData()">Reset</button>
+          </div>
         </div>
-
-        <!-- Analytics Page -->
-        <div class="page" id="page-analytics">
-            <div class="header">
-                <h1 class="header-title">Usage Analytics</h1>
-                <p class="header-subtitle">Track active users and login frequency</p>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon blue">
-                        <i data-lucide="users"></i>
-                    </div>
-                    <div class="stat-value" id="total-users">47</div>
-                    <div class="stat-label">Total Licensed Users</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon green">
-                        <i data-lucide="user-check"></i>
-                    </div>
-                    <div class="stat-value" id="active-users">38</div>
-                    <div class="stat-label">Active Users (30d)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon orange">
-                        <i data-lucide="user-minus"></i>
-                    </div>
-                    <div class="stat-value" id="unused-users">9</div>
-                    <div class="stat-label">Unused Licenses</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Usage by Tool</h2>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Tool</th>
-                                <th>Licensed</th>
-                                <th>Active</th>
-                                <th>Usage %</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usage-table">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        
+        <div class="settings-section">
+          <h3>Preferences</h3>
+          <div class="settings-option">
+            <label>Currency</label>
+            <select id="currency-setting" style="padding:8px;border-radius:6px;border:1px solid var(--border);" onchange="updateSetting('currency',this.value)">
+              <option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="GBP">GBP (£)</option>
+            </select>
+          </div>
+          <div class="settings-option">
+            <label>Billing Cycle</label>
+            <select id="billing-setting" style="padding:8px;border-radius:6px;border:1px solid var(--border);" onchange="updateSetting('billingCycle',this.value)">
+              <option value="monthly">Monthly</option>
+              <option value="annual">Annual</option>
+            </select>
+          </div>
         </div>
+      </div>
+    </div>
+  </main>
+</div>
 
-        <!-- Settings Page -->
-        <div class="page" id="page-settings">
-            <div class="header">
-                <h1 class="header-title">Settings</h1>
-                <p class="header-subtitle">Configure your StackWipe preferences</p>
-            </div>
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Add New Tool</h3>
+      <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;font-size:24px;color:var(--text-muted);">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="tool-form" onsubmit="saveTool(event)">
+        <input type="hidden" id="tool-index">
+        <div class="form-group">
+          <label>Tool Name *</label>
+          <input type="text" id="tool-name" required placeholder="e.g., Salesforce, Slack">
+        </div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="tool-category" required>
+            <option value="">Select category</option>
+            <option value="CRM">CRM</option>
+            <option value="Accounting">Accounting</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Productivity">Productivity</option>
+            <option value="Communication">Communication</option>
+            <option value="Analytics">Analytics</option>
+            <option value="Project Management">Project Management</option>
+            <option value="HR">HR</option>
+            <option value="Security">Security</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Monthly Cost ($) *</label>
+            <input type="number" id="tool-cost" required min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label>Billing Cycle</label>
+            <select id="tool-billing">
+              <option value="monthly">Monthly</option>
+              <option value="annual">Annual</option>
+              <option value="quarterly">Quarterly</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Total Users</label>
+            <input type="number" id="tool-users" min="1" value="1">
+          </div>
+          <div class="form-group">
+            <label>Active Users</label>
+            <input type="number" id="tool-active-users" min="0" value="1">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Status</label>
+            <select id="tool-status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="canceled">Canceled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Renewal Date</label>
+            <input type="date" id="tool-renewal">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" id="tool-notes" placeholder="Any additional notes">
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('tool-form').requestSubmit()">Save Tool</button>
+    </div>
+  </div>
+</div>
 
-            <div class="card">
-                <div class="settings-section">
-                    <h3 class="settings-title">Notifications</h3>
-                    <div class="toggle-row">
-                        <div>
-                            <div class="toggle-label">Renewal Alerts</div>
-                            <div style="font-size: 13px; color: var(--text-light);">Get notified before auto-renewals</div>
-                        </div>
-                        <div class="toggle active" onclick="this.classList.toggle('active')"></div>
-                    </div>
-                    <div class="toggle-row">
-                        <div>
-                            <div class="toggle-label">Usage Alerts</div>
-                            <div style="font-size: 13px; color: var(--text-light);">Alert when tools are underutilized</div>
-                        </div>
-                        <div class="toggle active" onclick="this.classList.toggle('active')"></div>
-                    </div>
-                    <div class="toggle-row">
-                        <div>
-                            <div class="toggle-label">Price Change Alerts</div>
-                            <div style="font-size: 13px; color: var(--text-light);">Notify when subscription prices change</div>
-                        </div>
-                        <div class="toggle active" onclick="this.classList.toggle('active')"></div>
-                    </div>
-                </div>
+<script>
+// 1. STATE
+let state = {
+  stackwipes: [],
+  settings: { currency: 'USD', billingCycle: 'monthly' },
+  ui: { page: 'dashboard', modal: null }
+};
+
+// 2. PERSISTENCE
+function save() {
+  localStorage.setItem('stackwipe-data', JSON.stringify({
+    stackwipes: state.stackwipes,
+    settings: state.settings
+  }));
+}
+
+function load() {
+  const d = JSON.parse(localStorage.getItem('stackwipe-data') || '{}');
+  state.stackwipes = d.stackwipes || getSampleData();
+  state.settings = d.settings || { currency: 'USD', billingCycle: 'monthly' };
+}
+
+// 3. SAMPLE DATA
+function getSampleData() {
+  const today = new Date();
+  const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+  const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+  
+  return [
+    {
+      id: 1,
+      name: 'Salesforce',
+      category: 'CRM',
+      cost: 150,
+      billingCycle: 'monthly',
+      users: 10,
+      activeUsers: 8,
+      status: 'active',
+      renewalDate: nextMonth.toISOString().split('T')[0],
+      notes: 'Sales team CRM'
+    },
+    {
+      id: 2,
+      name: 'HubSpot',
+      category: 'Marketing',
+      cost: 89,
+      billingCycle: 'monthly',
+      users: 5,
+      activeUsers: 3,
+      status: 'active',
+      renewalDate: nextWeek.toISOString().split('T')[0],
+      notes: 'Marketing automation'
+    },
+    {
+      id: 3,
+      name: 'Slack',
+      category: 'Communication',
+      cost: 12.50,
+      billingCycle: 'per user',
+      users: 25,
+      activeUsers: 22,
+      status: 'active',
+      renewalDate: nextMonth.toISOString().split('T')[0],
+      notes: 'Team communication'
+    },
+    {
+      id: 4,
+      name: 'QuickBooks',
+      category: 'Accounting',
+      cost: 75,
+      billingCycle: 'monthly',
+      users: 3,
+      activeUsers: 2,
+      status: 'active',
+      renewalDate: nextMonth.toISOString().split('T')[0],
+      notes: 'Finance team'
+    },
+    {
+      id: 5,
+      name: 'Trello',
+      category: 'Project Management',
+      cost: 0,
+      billingCycle: 'free',
+      users: 15,
+      activeUsers: 4,
+      status: 'inactive',
+      renewalDate: '',
+      notes: 'Project tracking - underutilized'
+    },
+    {
+      id: 6,
+      name: 'Asana',
+      category: 'Project Management',
+      cost: 24.99,
+      billingCycle: 'per user',
+      users: 12,
+      activeUsers: 10,
+      status: 'active',
+      renewalDate: nextMonth.toISOString().split('T')[0],
+      notes: 'Also for project management'
+    },
+    {
+      id: 7,
+      name: 'Mailchimp',
+      category: 'Marketing',
+      cost: 49,
+      billingCycle: 'monthly',
+      users: 2,
+      activeUsers: 1,
+      status: 'active',
+      renewalDate: nextWeek.toISOString().split('T')[0],
+      notes: 'Email marketing'
+    },
+    {
+      id: 8,
+      name: 'Zendesk',
+      category: 'CRM',
+      cost: 95,
+      billingCycle: 'monthly',
+      users: 6,
+      activeUsers: 5,
+      status: 'active',
+      renewalDate: nextMonth.toISOString().split('T')[0],
+      notes: 'Customer support'
+    }
+  ];
+}
+
+// 4. RENDER
+function render() {
+  renderDashboard();
+  renderSubscriptions();
+  renderIntegrations();
+  renderSettings();
+  updateNav();
+}
+
+function updateNav() {
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+    if (item.dataset.page === state.ui.page) {
+      item.classList.add('active');
+    }
+  });
+}
+
+function renderDashboard() {
+  // Stats
+  const total = state.stackwipes.length;
+  const monthlySpend = state.stackwipes.reduce((sum, t) => {
+    if (t.billingCycle === 'annual') return sum + (t.cost / 12);
+    if (t.billingCycle === 'quarterly') return sum + (t.cost / 3);
+    return sum + t.cost;
+  }, 0);
+  
+  const underutilized = state.stackwipes.filter(t => {
+    if (t.users === 0) return false;
+    return (t.activeUsers / t.users) < 0.5;
+  }).length;
+  
+  const today = new Date();
+  const in30Days = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const renewingSoon = state.stackwipes.filter(t => {
+    if (!t.renewalDate) return false;
+    const renewal = new Date(t.renewalDate);
+    return renewal >= today && renewal <= in30Days;
+  }).length;
+  
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-spend').textContent = '$' + monthlySpend.toFixed(0);
+  document.getElementById('stat-underutilized').textContent = underutilized;
+  document.getElementById('stat-renewing').textContent = renewingSoon;
+  
+  // Redundancy Alerts
+  const categories = {};
+  state.stackwipes.forEach(t => {
+    if (t.category && t.status === 'active') {
+      if (!categories[t.category]) categories[t.category] = [];
+      categories[t.category].push(t);
+    }
+  });
+  
+  let redundancyHTML = '';
+  Object.keys(categories).forEach(cat => {
+    if (categories[cat].length > 1) {
+      const tools = categories[cat].map(t => t.name).join(', ');
+      redundancyHTML += `<div class="alert warning">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div><strong>${cat}</strong>: Multiple tools (${tools}). Consider consolidating.</div>
+      </div>`;
+    }
+  });
+  
+  if (!redundancyHTML) {
+    redundancyHTML = '<p style="color:var(--text-muted);">No redundancy detected. Your stack looks clean!</p>';
+  }
+  document.getElementById('redundancy-alerts').innerHTML = redundancyHTML;
+  
+  // Renewal Alerts
+  const renewalHTML = state.stackwipes
+    .filter(t => t.renewalDate && t.status === 'active')
+    .sort((a, b) => new Date(a.renewalDate) - new Date(b.renewalDate))
+    .slice(0, 5)
+    .map(t => {
+      const days = Math.ceil((new Date(t.renewalDate) - today) / (1000 * 60 * 60 * 24));
+      return `<div class="alert danger">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <div><strong>${t.name}</strong> renews in ${days} days (${t.renewalDate}) - $${t.cost}/${t.billingCycle}</div>
+      </div>`;
+    })
+    .join('');
+  
+  document.getElementById('renewal-alerts').innerHTML = renewalHTML || '<p style="color:var
