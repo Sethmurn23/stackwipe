@@ -1,127 +1,608 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stackwipe - Interactive Tool</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; color: #334155; min-height: 100vh; }
-        .container { max-width: 650px; margin: 0 auto; padding: 30px 20px; }
-        header { text-align: center; margin-bottom: 25px; }
-        header h1 { font-size: 1.6rem; color: #1e293b; margin-bottom: 6px; }
-        header p { color: #64748b; font-size: 13px; }
-        .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
-        .card h2 { font-size: 0.95rem; margin-bottom: 14px; color: #475569; font-weight: 600; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-weight: 500; margin-bottom: 5px; font-size: 13px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; }
-        .form-group textarea { min-height: 70px; }
-        .btn { background: #6366f1; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; }
-        .btn:hover { background: #4f46e5; }
-        .btn:disabled { background: #94a3b8; }
-        .output { background: #f8fafc; border-radius: 6px; padding: 16px; margin-top: 14px; display: none; }
-        .output.visible { display: block; }
-        .output-item { padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-        .output-item:last-child { border: none; }
-        .output-item::before { content: '→ '; color: #6366f1; }
-        .history { margin-top: 20px; }
-        .history h3 { font-size: 13px; margin-bottom: 10px; color: #475569; }
-        .history-item { background: #f8fafc; padding: 10px; border-radius: 6px; margin-bottom: 6px; font-size: 12px; color: #64748b; }
-        .clear-btn { background: #ef4444; margin-top: 8px; }
-        .clear-btn:hover { background: #dc2626; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StackWipe — Automate your SaaS stack so you stop paying for tools you don't use</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --error: #ef4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* HERO SECTION */
+    .hero {
+      padding: 80px 0 64px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    .hero .subheadline {
+      font-size: 1.25rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* PROBLEM STATEMENT */
+    .problem {
+      padding: 64px 0;
+      background: var(--surface);
+    }
+
+    .problem h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .problem ul {
+      list-style: none;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .problem li {
+      position: relative;
+      padding-left: 32px;
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+      color: var(--muted);
+    }
+
+    .problem li::before {
+      content: "✕";
+      position: absolute;
+      left: 0;
+      color: var(--error);
+      font-weight: 700;
+    }
+
+    /* HOW IT WORKS */
+    .how-it-works {
+      padding: 64px 0;
+    }
+
+    .how-it-works h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .steps {
+      display: grid;
+      gap: 32px;
+    }
+
+    @media (min-width: 600px) {
+      .steps {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .step h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    /* INTERACTIVE DEMO */
+    .demo {
+      padding: 64px 0;
+      background: var(--surface);
+    }
+
+    .demo h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .demo-container {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-form {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .demo-form input {
+      flex: 1;
+      min-width: 150px;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .demo-form input:focus {
+      border-color: var(--primary);
+    }
+
+    .demo-form input[type="number"] {
+      max-width: 120px;
+    }
+
+    .demo-list {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+
+    .demo-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .demo-item:first-child {
+      border-top: 1px solid var(--border);
+    }
+
+    .demo-item-info {
+      display: flex;
+      justify-content: space-between;
+      flex: 1;
+      gap: 16px;
+    }
+
+    .demo-item-name {
+      font-weight: 500;
+    }
+
+    .demo-item-cost {
+      color: var(--muted);
+    }
+
+    .demo-item-delete {
+      background: none;
+      border: none;
+      color: var(--error);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .demo-item-delete:hover {
+      background: #fef2f2;
+    }
+
+    .demo-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: var(--surface);
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .demo-total-amount {
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .demo-empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 32px;
+    }
+
+    /* FEATURES */
+    .features {
+      padding: 64px 0;
+    }
+
+    .features h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .feature-grid {
+      display: grid;
+      gap: 24px;
+    }
+
+    @media (min-width: 600px) {
+      .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .feature-card {
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: box-shadow 0.2s;
+    }
+
+    .feature-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    /* PRICING */
+    .pricing {
+      padding: 64px 0;
+      background: var(--surface);
+    }
+
+    .pricing h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .pricing-card {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 40px;
+      max-width: 480px;
+      margin: 0 auto;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .pricing-card h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .pricing-price {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .pricing-price span {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .pricing-features {
+      list-style: none;
+      text-align: left;
+      margin: 24px 0 32px;
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pricing-features li {
+      padding: 8px 0;
+      padding-left: 28px;
+      position: relative;
+    }
+
+    .pricing-features li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .pricing-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 16px;
+    }
+
+    /* FOOTER */
+    .footer {
+      padding: 32px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
     <div class="container">
-        <header>
-            <h1>Stackwipe</h1>
-            <p>Tool for users</p>
-        </header>
-        
-        <div class="card">
-            <h2>Enter Details</h2>
-            <div class="form-group"><label>Input 1</label><input type="text" id="input1" placeholder="Enter value..."></div>
-<div class="form-group"><label>Input 2</label><input type="text" id="input2" placeholder="Enter value..."></div>
-            <button class="btn" id="actionBtn" onclick="runAction()">Generate Result</button>
-            
-            <div class="output" id="output">
-                <div id="results"></div>
-            </div>
-        </div>
-        
-        <div class="history">
-            <h3>📜 Previous Results</h3>
-            <div id="historyList"></div>
-            <button class="btn clear-btn" onclick="clearHistory()">Clear History</button>
-        </div>
+      <h1>Stop overpaying for SaaS you don't use</h1>
+      <p class="subheadline">StackWipe finds every subscription draining your budget and shows you exactly where to cut.</p>
+      <a href="#demo" class="btn btn-primary">Try Free Demo ↓</a>
     </div>
-    
-    <script>
-        const STORAGE_KEY = 'ai_factory_stackwipe_history';
-        const WORKFLOW = 'general';
+  </section>
+
+  <!-- PROBLEM STATEMENT SECTION -->
+  <section class="problem">
+    <div class="container">
+      <h2>The problem with spreadsheets</h2>
+      <ul>
+        <li>Small business owners waste 5+ hours weekly managing overlapping SaaS subscriptions</li>
+        <li>Can't see what they're paying for across vendors—all that billing data lives in different portals</li>
+        <li>Spend hours manually integrating tools that should work together automatically</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS SECTION -->
+  <section class="how-it-works">
+    <div class="container">
+      <h2>How StackWipe works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Automated Discovery</h3>
+          <p>Scan email inboxes, bank statements, and connected apps to find every subscription in use</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Unified Dashboard</h3>
+          <p>Consolidated view of all SaaS costs with monthly trends and renewal dates</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Redundancy Detection</h3>
+          <p>AI identifies tools with overlapping capabilities and suggests consolidation opportunities</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE DEMO SECTION -->
+  <section class="demo" id="demo">
+    <div class="container">
+      <h2>Try it yourself — no signup required</h2>
+      <div class="demo-container">
+        <form class="demo-form" id="demo-form">
+          <input type="text" id="demo-name" placeholder="Subscription name" required>
+          <input type="number" id="demo-cost" placeholder="Cost/mo" min="0" step="0.01" required>
+          <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+        <ul class="demo-list" id="demo-list"></ul>
+        <div class="demo-total">
+          <span>Total monthly spend</span>
+          <span class="demo-total-amount" id="demo-total">$0</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES SECTION -->
+  <section class="features">
+    <div class="container">
+      <h2>Everything you need to optimize your stack</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Automated SaaS Discovery</h3>
+          <p>Scan email inboxes, bank statements, and connected apps to find every subscription in use</p>
+        </div>
+        <div class="feature-card">
+          <h3>Unified Spend Dashboard</h3>
+          <p>Consolidated view of all SaaS costs with monthly trends and renewal dates</p>
+        </div>
+        <div class="feature-card">
+          <h3>Redundancy Detector</h3>
+          <p>AI identifies tools with overlapping capabilities and suggests consolidation opportunities</p>
+        </div>
+        <div class="feature-card">
+          <h3>Integration Templates</h3>
+          <p>Pre-built no-code workflows connecting popular SMB tool pairs (e.g., CRM to accounting, marketing to CRM)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING SECTION -->
+  <section class="pricing">
+    <div class="container">
+      <h2>Simple, transparent pricing</h2>
+      <div class="pricing-card">
+        <h3>Pro Plan</h3>
+        <div class="pricing-price">$79<span>/mo</span></div>
+        <ul class="pricing-features">
+          <li>Automated SaaS discovery across all accounts</li>
+          <li>Unified spend dashboard with trends</li>
+          <li>Redundancy detection with AI suggestions</li>
+          <li>Integration templates for popular tools</li>
+          <li>Priority support and account management</li>
+        </ul>
+        <a href="#demo" class="btn btn-primary">Get Started Free</a>
+        <p class="pricing-note">30-day money-back guarantee. No questions asked.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2024 StackWipe. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    function getDefaultItems() {
+      return [
+        { name: "Slack", cost: 12.50 },
+        { name: "Notion", cost: 20.00 },
+        { name: "HubSpot", cost: 45.00 }
+      ];
+    }
+
+    let demoItems = JSON.parse(localStorage.getItem('stackwipe-demo')) || getDefaultItems();
+
+    function saveDemo() {
+      localStorage.setItem('stackwipe-demo', JSON.stringify(demoItems));
+    }
+
+    function formatCurrency(amount) {
+      return '$' + amount.toFixed(2);
+    }
+
+    function renderDemo() {
+      const list = document.getElementById('demo-list');
+      const totalEl = document.getElementById('demo-total');
+      
+      if (demoItems.length === 0) {
+        list.innerHTML = '<li class="demo-empty">No subscriptions added yet. Add one above!</li>';
+        totalEl.textContent = '$0';
+        return;
+      }
+
+      let total = 0;
+      let html = '';
+
+      demoItems.forEach(function(item, index) {
+        total += item.cost;
+        html += '<li class="demo-item">';
+        html += '<div class="demo-item-info">';
+        html += '<span class="demo-item-name">' + item.name + '</span>';
+        html += '<span class="demo-item-cost">' + formatCurrency(item.cost) + '/mo</span>';
+        html += '</div>';
+        html += '<button class="demo-item-delete" data-index="' + index + '">Delete</button>';
+        html += '</li>';
+      });
+
+      list.innerHTML = html;
+      totalEl.textContent = formatCurrency(total);
+
+      // Attach delete handlers
+      document.querySelectorAll('.demo-item-delete').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          deleteDemoItem(parseInt(this.getAttribute('data-index'), 10));
+        });
+      });
+    }
+
+    function addDemoItem(e) {
+      e.preventDefault();
+      
+      const nameInput = document.getElementById('demo-name');
+      const costInput = document.getElementById('demo-cost');
+      
+      const name = nameInput.value.trim();
+      const cost = parseFloat(costInput.value);
+      
+      if (name && !isNaN(cost) && cost >= 0) {
+        demoItems.push({ name: name, cost: cost });
+        saveDemo();
+        renderDemo();
         
-        let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        
-        function renderHistory() {
-            const container = document.getElementById('historyList');
-            if (!history.length) {
-                container.innerHTML = '<p style="color:#94a3b8;font-size:12px;">No history yet.</p>';
-                return;
-            }
-            container.innerHTML = history.slice(0, 5).map(h => 
-                '<div class="history-item">' + new Date(h.time).toLocaleString() + ' - ' + (h.result || 'Generated').substring(0, 40) + '</div>'
-            ).join('');
-        }
-        
-        function saveHistory(result) {
-            history.unshift({ result, time: Date.now() });
-            history = history.slice(0, 20);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-            renderHistory();
-        }
-        
-        function clearHistory() {
-            history = [];
-            localStorage.setItem(STORAGE_KEY, '[]');
-            renderHistory();
-        }
-        
-        const outputs = {
-            business: ['✓ Set up Google Business Profile', '✓ Add business photos', '✓ Complete business description', '✓ Verify location', '✓ Enable messaging'],
-            content: ['Write about your latest product', 'Share customer success story', 'Create how-to guide', 'Post team spotlight', 'Announce special offer'],
-            reviews: ['Thank you sincerely for your feedback!', 'We apologize for falling short', 'We value your honest opinion', 'Would love to serve you better'],
-            booking: ['Appointment scheduled for ' + new Date().toLocaleDateString(), 'Reminder sent to customer', 'Calendar updated', 'Confirmation email sent'],
-            finance: ['Invoice #INV-001 created', 'Payment link generated', 'Receipt saved to records', 'Report updated'],
-            leads: ['Lead captured: ' + new Date().toISOString(), 'Auto-followup scheduled', 'CRM record created', 'Notification sent'],
-            general: ['Result generated based on input', 'Processing complete', 'Output ready for use', 'Action completed']
-        };
-        
-        function runAction() {
-            const btn = document.getElementById('actionBtn');
-            const output = document.getElementById('output');
-            const results = document.getElementById('results');
-            
-            const inputs = document.querySelectorAll('input, select, textarea');
-            let hasValue = false;
-            inputs.forEach(i => { if (i.value) hasValue = true; });
-            
-            if (!hasValue) { alert('Please fill in at least one field'); return; }
-            
-            btn.disabled = true;
-            btn.textContent = 'Generating...';
-            
-            setTimeout(() => {
-                const items = outputs[WORKFLOW] || outputs.general;
-                results.innerHTML = items.map(i => '<div class="output-item">' + i + '</div>').join('');
-                output.classList.add('visible');
-                saveHistory('Generated ' + items.length + ' items');
-                btn.disabled = false;
-                btn.textContent = 'Generate Result';
-            }, 600);
-        }
-        
-        renderHistory();
-    </script>
+        nameInput.value = '';
+        costInput.value = '';
+        nameInput.focus();
+      }
+    }
+
+    function deleteDemoItem(index) {
+      demoItems.splice(index, 1);
+      saveDemo();
+      renderDemo();
+    }
+
+    document.getElementById('demo-form').addEventListener('submit', addDemoItem);
+    window.addEventListener('load', renderDemo);
+  </script>
+
 </body>
 </html>
